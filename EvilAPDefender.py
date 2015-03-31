@@ -482,148 +482,148 @@ def LearningMode():
     # here is Learning stuff
     print "=====================================================\n"
     print "Entering Learning Mode ..."
-    #try:
-    while True:
-	Conf_viewSSIDs()
-    
-	Choices()
+    try:
+	while True:
+	    Conf_viewSSIDs()
 	
-	choice = raw_input(bcolors.OKBLUE + 'Enter the number for your choice: ' + bcolors.ENDC)
-	if choice == "1":
-	    print "\n======================= AuoConfig Mode =======================\n"
-	    SSID = raw_input('Enter the SSID name you want to whitelist: ')
-	    #cursor.execute("select * from ssids where mac='{}')
-	    cmd = "select * from ssids where ssid=%s"
-	    cursor.execute(cmd, (SSID))
-	    if cursor.rowcount > 0:
-		cmd = "delete from whitelist where ssid=%s"
-		cursor.execute(cmd, (SSID))
-		cmd = "delete from whitelist_OUIs where ssid=%s"
-		cursor.execute(cmd, (SSID))
-		cmd = "insert into whitelist(mac,ssid,min_pwr,max_pwr,channel,CIPHER,Enc,Auth) select mac,ssid,pwr-10,pwr+10,channel,CIPHER,Enc,Auth \
-		from ssids where ssid = %s"
-		cursor.execute(cmd, (SSID))
-		cmd = "insert into whitelist_OUIs select * from ssids_OUIs where ssid=%s"
-		cursor.execute(cmd, (SSID))
-		db_connection.commit()
-		print "The SSID and all its Access Points have been whitelisted!"
-		time.sleep(1)
-	    else:
-		print "The SSID you entered cannot be found among the discovered SSIDs"
-	elif choice == "2":
-	    new_bssid = raw_input('Enter the BSSID you want to whitelist: ')
-	    cmd = "select * from ssids where mac=%s"
-	    cursor.execute(cmd, (new_bssid))
-	    if cursor.rowcount > 0:
-		cmd = "delete from whitelist where mac=%s"
-		cursor.execute(cmd, (new_bssid))
-		cmd = "delete from whitelist_OUIs where mac=%s"
-		cursor.execute(cmd, (new_bssid))
-		cmd = "insert into whitelist(mac,ssid,min_pwr,max_pwr,channel,CIPHER,Enc,Auth) select mac,ssid,pwr-10,pwr+10,channel,CIPHER,Enc,Auth \
-		from ssids where mac = %s"
-		cursor.execute(cmd, (new_bssid))
-		cmd = "insert into whitelist_OUIs select * from ssids_OUIs where mac=%s"
-		cursor.execute(cmd, (new_bssid))
-		db_connection.commit()
-		print "The identified Access Point has been whitelisted!"
-		time.sleep(1)
-	    else:
-		print "The BSSID you entered cannot be found among the discovered BSSIDs"
-	elif choice == "3":
-	    bssid_rm = raw_input('Enter the BSSID you want to remove from whitelist: ')
-	    cmd = "select * from whitelist where mac=%s"
-	    cursor.execute(cmd, (bssid_rm))
-	    if cursor.rowcount > 0:
-		bssid_rm_confirm = raw_input(bcolors.WARNING + 'This will remove the identified BSSID from whitelist! Are you still want to continue?(y/n): ' + bcolors.ENDC)
-		if bssid_rm_confirm == "y":
-		    cmd = "delete from whitelist where mac=%s"
-		    cursor.execute(cmd, (bssid_rm))
-		    cmd = "delete from whitelist_OUIs where mac=%s"
-		    cursor.execute(cmd, (bssid_rm))
-		    db_connection.commit()
-		    print "The identified Access Point has been removed from the whitelist!"
-		else:
-		    print "No BSSID has been removed!"
-	    else:
-		print "The BSSID you entered cannot be found among the whitelisted BSSIDs"
-	elif choice == "4":
-	    confirm = raw_input(bcolors.WARNING + 'This will remove all whitelisted SSIDs! Are you still want to continue?(y/n): ' + bcolors.ENDC)
-	    if confirm == "y":
-		cmd = "delete from whitelist"
-		cursor.execute(cmd)
-		cmd = "delete from whitelist_OUIs"
-		cursor.execute(cmd)
-		db_connection.commit()
-		print "All whitelisted SSIDs have been removed!"
-	    else:
-		print "No SSID has been removed!"
-	    time.sleep(1)
-	elif choice == "5":
-	    while True:
-		cmd = "select * from options"
-		cursor.execute(cmd)
-		print "======================="
-		print "Current options:"
-		if cursor.rowcount > 0:
-		    options_data = cursor.fetchall()
-		    print "(Key, Value)\n"
-		    for row in options_data:
-			if row[0] == "admin_smtp_password":
-			    print "({}, ************)".format(row[0])
-			else:
-			    print "({}, {})".format(row[0], row[1])
-		    print "\n"
-		    
-		Options()
-		option = raw_input(bcolors.OKBLUE + 'Enter the number for your choice: ' + bcolors.ENDC)
-		if option == "1":
-		    deauth_time = int(raw_input('Enter Deauth attack time (attack duration in seconds. To disable enter 0): '))
-		    cmd = "delete from options where opt_key = 'deauth_time'"
-		    cursor.execute(cmd)
-		    cmd = "insert into options values('deauth_time',%s)"
-		    cursor.execute(cmd, (deauth_time))
-		    deauth_repeat = int(raw_input('How many times do you want to repeat Deauth attack (minimum 1): '))
-		    cmd = "delete from options where opt_key = 'deauth_repeat'"
-		    cursor.execute(cmd)
-		    cmd = "insert into options values('deauth_repeat',%s)"
-		    cursor.execute(cmd, (deauth_repeat))
-		    db_connection.commit()
-		elif option == "2":
-		    admin_email = raw_input('Enter admin email: ')
-		    cmd = "delete from options where opt_key = 'admin_email'"
-		    cursor.execute(cmd)
-		    cmd = "insert into options values('admin_email',%s)"
-		    cursor.execute(cmd, (admin_email))
-		    admin_smtp = raw_input('Enter SMTP address or IP: ')
-		    cmd = "delete from options where opt_key = 'admin_smtp'"
-		    cursor.execute(cmd)
-		    cmd = "insert into options values('admin_smtp',%s)"
-		    cursor.execute(cmd, (admin_smtp))
-		    admin_smtp_username = raw_input('Enter SMTP username for authentication (complete email): ')
-		    cmd = "delete from options where opt_key = 'admin_smtp_username'"
-		    cursor.execute(cmd)
-		    cmd = "insert into options values('admin_smtp_username',%s)"
-		    cursor.execute(cmd, (admin_smtp_username))
-		    admin_smtp_password = raw_input('Enter SMTP password for authentication: ')
-		    cmd = "delete from options where opt_key = 'admin_smtp_password'"
-		    cursor.execute(cmd)
-		    cmd = "insert into options values('admin_smtp_password',%s)"
-		    cursor.execute(cmd, (admin_smtp_password))
-		    db_connection.commit()
-		else:
-		    break
+	    Choices()
 	    
-	elif choice == "6":
-	    print "\n\nEntering Normal Mode ...\n"
-	    CheckEvilAP()
-	    break
-	elif choice == "7":
-	    print "Exiting the application ... please wait ..."
-	    break
-	else:
-	    print "Wrong choice! Please use one of the avilable choices"
-    #except:
-	#print bcolors.FAIL + bcolors.BOLD + "Unexpected error in 'LearningMode': {}".format(sys.exc_info()[0]) + bcolors.ENDC
+	    choice = raw_input(bcolors.OKBLUE + 'Enter the number for your choice: ' + bcolors.ENDC)
+	    if choice == "1":
+		print "\n======================= AuoConfig Mode =======================\n"
+		SSID = raw_input('Enter the SSID name you want to whitelist: ')
+		#cursor.execute("select * from ssids where mac='{}')
+		cmd = "select * from ssids where ssid=%s"
+		cursor.execute(cmd, (SSID))
+		if cursor.rowcount > 0:
+		    cmd = "delete from whitelist where ssid=%s"
+		    cursor.execute(cmd, (SSID))
+		    cmd = "delete from whitelist_OUIs where ssid=%s"
+		    cursor.execute(cmd, (SSID))
+		    cmd = "insert into whitelist(mac,ssid,min_pwr,max_pwr,channel,CIPHER,Enc,Auth) select mac,ssid,pwr-10,pwr+10,channel,CIPHER,Enc,Auth \
+		    from ssids where ssid = %s"
+		    cursor.execute(cmd, (SSID))
+		    cmd = "insert into whitelist_OUIs select * from ssids_OUIs where ssid=%s"
+		    cursor.execute(cmd, (SSID))
+		    db_connection.commit()
+		    print "The SSID and all its Access Points have been whitelisted!"
+		    time.sleep(1)
+		else:
+		    print "The SSID you entered cannot be found among the discovered SSIDs"
+	    elif choice == "2":
+		new_bssid = raw_input('Enter the BSSID you want to whitelist: ')
+		cmd = "select * from ssids where mac=%s"
+		cursor.execute(cmd, (new_bssid))
+		if cursor.rowcount > 0:
+		    cmd = "delete from whitelist where mac=%s"
+		    cursor.execute(cmd, (new_bssid))
+		    cmd = "delete from whitelist_OUIs where mac=%s"
+		    cursor.execute(cmd, (new_bssid))
+		    cmd = "insert into whitelist(mac,ssid,min_pwr,max_pwr,channel,CIPHER,Enc,Auth) select mac,ssid,pwr-10,pwr+10,channel,CIPHER,Enc,Auth \
+		    from ssids where mac = %s"
+		    cursor.execute(cmd, (new_bssid))
+		    cmd = "insert into whitelist_OUIs select * from ssids_OUIs where mac=%s"
+		    cursor.execute(cmd, (new_bssid))
+		    db_connection.commit()
+		    print "The identified Access Point has been whitelisted!"
+		    time.sleep(1)
+		else:
+		    print "The BSSID you entered cannot be found among the discovered BSSIDs"
+	    elif choice == "3":
+		bssid_rm = raw_input('Enter the BSSID you want to remove from whitelist: ')
+		cmd = "select * from whitelist where mac=%s"
+		cursor.execute(cmd, (bssid_rm))
+		if cursor.rowcount > 0:
+		    bssid_rm_confirm = raw_input(bcolors.WARNING + 'This will remove the identified BSSID from whitelist! Are you still want to continue?(y/n): ' + bcolors.ENDC)
+		    if bssid_rm_confirm == "y":
+			cmd = "delete from whitelist where mac=%s"
+			cursor.execute(cmd, (bssid_rm))
+			cmd = "delete from whitelist_OUIs where mac=%s"
+			cursor.execute(cmd, (bssid_rm))
+			db_connection.commit()
+			print "The identified Access Point has been removed from the whitelist!"
+		    else:
+			print "No BSSID has been removed!"
+		else:
+		    print "The BSSID you entered cannot be found among the whitelisted BSSIDs"
+	    elif choice == "4":
+		confirm = raw_input(bcolors.WARNING + 'This will remove all whitelisted SSIDs! Are you still want to continue?(y/n): ' + bcolors.ENDC)
+		if confirm == "y":
+		    cmd = "delete from whitelist"
+		    cursor.execute(cmd)
+		    cmd = "delete from whitelist_OUIs"
+		    cursor.execute(cmd)
+		    db_connection.commit()
+		    print "All whitelisted SSIDs have been removed!"
+		else:
+		    print "No SSID has been removed!"
+		time.sleep(1)
+	    elif choice == "5":
+		while True:
+		    cmd = "select * from options"
+		    cursor.execute(cmd)
+		    print "======================="
+		    print "Current options:"
+		    if cursor.rowcount > 0:
+			options_data = cursor.fetchall()
+			print "(Key, Value)\n"
+			for row in options_data:
+			    if row[0] == "admin_smtp_password":
+				print "({}, ************)".format(row[0])
+			    else:
+				print "({}, {})".format(row[0], row[1])
+			print "\n"
+			
+		    Options()
+		    option = raw_input(bcolors.OKBLUE + 'Enter the number for your choice: ' + bcolors.ENDC)
+		    if option == "1":
+			deauth_time = int(raw_input('Enter Deauth attack time (attack duration in seconds. To disable enter 0): '))
+			cmd = "delete from options where opt_key = 'deauth_time'"
+			cursor.execute(cmd)
+			cmd = "insert into options values('deauth_time',%s)"
+			cursor.execute(cmd, (deauth_time))
+			deauth_repeat = int(raw_input('How many times do you want to repeat Deauth attack (minimum 1): '))
+			cmd = "delete from options where opt_key = 'deauth_repeat'"
+			cursor.execute(cmd)
+			cmd = "insert into options values('deauth_repeat',%s)"
+			cursor.execute(cmd, (deauth_repeat))
+			db_connection.commit()
+		    elif option == "2":
+			admin_email = raw_input('Enter admin email: ')
+			cmd = "delete from options where opt_key = 'admin_email'"
+			cursor.execute(cmd)
+			cmd = "insert into options values('admin_email',%s)"
+			cursor.execute(cmd, (admin_email))
+			admin_smtp = raw_input('Enter SMTP address or IP: ')
+			cmd = "delete from options where opt_key = 'admin_smtp'"
+			cursor.execute(cmd)
+			cmd = "insert into options values('admin_smtp',%s)"
+			cursor.execute(cmd, (admin_smtp))
+			admin_smtp_username = raw_input('Enter SMTP username for authentication (complete email): ')
+			cmd = "delete from options where opt_key = 'admin_smtp_username'"
+			cursor.execute(cmd)
+			cmd = "insert into options values('admin_smtp_username',%s)"
+			cursor.execute(cmd, (admin_smtp_username))
+			admin_smtp_password = raw_input('Enter SMTP password for authentication: ')
+			cmd = "delete from options where opt_key = 'admin_smtp_password'"
+			cursor.execute(cmd)
+			cmd = "insert into options values('admin_smtp_password',%s)"
+			cursor.execute(cmd, (admin_smtp_password))
+			db_connection.commit()
+		    else:
+			break
+		
+	    elif choice == "6":
+		print "\n\nEntering Normal Mode ...\n"
+		CheckEvilAP()
+		break
+	    elif choice == "7":
+		print "Exiting the application ... please wait ..."
+		break
+	    else:
+		print "Wrong choice! Please use one of the avilable choices"
+    except:
+	print bcolors.FAIL + bcolors.BOLD + "Unexpected error in 'LearningMode': {}".format(sys.exc_info()[0]) + bcolors.ENDC
 	    
 	
 	
