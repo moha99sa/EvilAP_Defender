@@ -138,15 +138,15 @@ def AlertAdmin(message):
 			except:
 			    print bcolors.FAIL + bcolors.BOLD + "\nError: unable to send an email to admin: {}\n".format(sys.exc_info()[0]) + bcolors.ENDC
 		    else:
-			print bcolors.FAIL + "Cannot send alert. SMTP password not found!\n" + bcolors.ENDC
+			print bcolors.WARNING + "Cannot send alert. SMTP password not found!\nConfigure admin notification from Learning Mode\n" + bcolors.ENDC
 		else:
-		    print bcolors.FAIL + "Cannot send alert. SMTP username not found!\n" + bcolors.ENDC
+		    print bcolors.WARNING + "Cannot send alert. SMTP username not found!\nConfigure admin notification from Learning Mode\n" + bcolors.ENDC
 	    else:
-		print bcolors.FAIL + "Cannot send alert. SMTP address not found!\n" + bcolors.ENDC
+		print bcolors.WARNING + "Cannot send alert. SMTP address not found!\nConfigure admin notification from Learning Mode\n" + bcolors.ENDC
 	else:
-	    print bcolors.FAIL + "Cannot send alert. Admin email not found!\n" + bcolors.ENDC
+	    print bcolors.WARNING + "Cannot send alert. Admin email not found!\nConfigure admin notification from Learning Mode\n" + bcolors.ENDC
     except:
-	print bcolors.FAIL + bcolors.BOLD + "Unexpected error in 'AlertAdmin': {}".format(sys.exc_info()[0]) + bcolors.ENDC
+	print bcolors.FAIL + bcolors.BOLD + "Unexpected error in 'AlertAdmin': {}\n".format(sys.exc_info()[0]) + bcolors.ENDC
     
     return
     
@@ -194,7 +194,7 @@ def Conf_viewSSIDs():
 	    print "\nCurrently, There are No Whitelisted OUIs\n"
 	    
     except:
-	print bcolors.FAIL + bcolors.BOLD + "Unexpected error in 'Conf_viewSSIDs': {}".format(sys.exc_info()[0]) + bcolors.ENDC
+	print bcolors.FAIL + bcolors.BOLD + "Unexpected error in 'Conf_viewSSIDs': {}\n".format(sys.exc_info()[0]) + bcolors.ENDC
 
 # Deauth Attack
 def Deauth(Dbssid,Dssid,Dchannel,Dtime):
@@ -210,7 +210,7 @@ def Deauth(Dbssid,Dssid,Dchannel,Dtime):
 	time.sleep(Dtime)
 	aireplay.terminate()
     except:
-	print bcolors.FAIL + bcolors.BOLD + "Unexpected error in 'Deauth': {}".format(sys.exc_info()[0]) + bcolors.ENDC
+	print bcolors.FAIL + bcolors.BOLD + "Unexpected error in 'Deauth': {}\n".format(sys.exc_info()[0]) + bcolors.ENDC
 
 #Initialize options
 def Initialize_options():
@@ -226,7 +226,7 @@ def Initialize_options():
 	    cmd = "insert into options values('deauth_repeat','1')"
 	    cursor.execute(cmd)
     except:
-	print bcolors.FAIL + bcolors.BOLD + "Unexpected error in 'Initialize_options': {}".format(sys.exc_info()[0]) + bcolors.ENDC
+	print bcolors.FAIL + bcolors.BOLD + "Unexpected error in 'Initialize_options': {}\n".format(sys.exc_info()[0]) + bcolors.ENDC
     
 # Tagged Parameters parsing
 def insert_ap(pkt):
@@ -269,7 +269,7 @@ def insert_ap(pkt):
 	
 	aps[bssid] = (ssid)
     except:
-	print bcolors.FAIL + bcolors.BOLD + "Unexpected error in 'insert_ap': {}".format(sys.exc_info()[0]) + bcolors.ENDC
+	print bcolors.FAIL + bcolors.BOLD + "Unexpected error in 'insert_ap': {}\n".format(sys.exc_info()[0]) + bcolors.ENDC
 
 # Check for Evil APs
 def CheckEvilAP():
@@ -340,7 +340,7 @@ def CheckEvilAP():
 			    raw_value = cursor.fetchone()
 			    deauth_repeat = int(raw_value[0])
 			    if deauth_repeat <= 0:
-				deauth_repeat = 2
+				deauth_repeat = 1
 			    for i in range(deauth_repeat):
 				if len(Evil_data) == 1:
 				    for row in Evil_data:
@@ -351,6 +351,8 @@ def CheckEvilAP():
 					Deauth(row[1],row[2],str(row[4]),deauth_time)
 			print bcolors.OKBLUE + "\nStop attacking Evil Access Point ..." + bcolors.ENDC
 			print "\n\n"
+		    else:
+			print bcolors.WARNING + "Preventive Mode is not enabled\n" + bcolors.ENDC
 			
 	    elif EvilAPAttrib:
 		print bcolors.WARNING + bcolors.BOLD + "Fake AP with different Attribute Detected!\n" + bcolors.ENDC
@@ -392,6 +394,8 @@ def CheckEvilAP():
 					    Deauth(row[1],row[2],str(row[4]),deauth_time)
 			    print bcolors.OKBLUE + "\nStop attacking Evil Access Point ..." + bcolors.ENDC
 			    print "\n\n"
+			else:
+			    print bcolors.WARNING + "Preventive Mode is not enabled\n" + bcolors.ENDC
 			
 	    elif EvilAPOUI:
 		print bcolors.WARNING + bcolors.BOLD + "Fake AP with different OUI Detected!\n" + bcolors.ENDC
@@ -409,9 +413,10 @@ def CheckEvilAP():
 	    print "\n#####################################\n"
 
 	else:
-	    print "No Whitelisted SSID Detected!\n"
+	    print bcolors.WARNING + bcolors.BOLD + "No Whitelisted SSID Detected!\n" 
+	    print "Run the tool in the Learning Mode first and add your own SSID into whitelist" + bcolors.ENDC
     except:
-	print bcolors.FAIL + bcolors.BOLD + "Unexpected error in 'CheckEvilAP': {}".format(sys.exc_info()[0]) + bcolors.ENDC
+	print bcolors.FAIL + bcolors.BOLD + "Unexpected error in 'CheckEvilAP': {}\n".format(sys.exc_info()[0]) + bcolors.ENDC
 
 # Parsing the output
 def ParseAirodumpCSV():
@@ -450,7 +455,7 @@ def ParseAirodumpCSV():
 	finally:
 	    f.close()      # closing
     except:
-	print bcolors.FAIL + bcolors.BOLD + "Unexpected error in 'ParseAirodumpCSV': {}".format(sys.exc_info()[0]) + bcolors.ENDC
+	print bcolors.FAIL + bcolors.BOLD + "Unexpected error in 'ParseAirodumpCSV': {}\n".format(sys.exc_info()[0]) + bcolors.ENDC
 
 # Release resources
 def Reset(Ropt):
@@ -458,6 +463,8 @@ def Reset(Ropt):
 	time.sleep(1)
 	if Ropt == "INTF":
 	    os.system('airmon-ng stop ' + mon_iface)
+	    os.system('airmon-ng stop ' + wireless_interface)
+	elif Ropt == "INTF_NoMon":
 	    os.system('airmon-ng stop ' + wireless_interface)
 	elif Ropt == "DB":
 	    cursor.close()
@@ -469,7 +476,7 @@ def Reset(Ropt):
 	    cursor.close()
 	    db_connection.close()
     except:
-	print bcolors.FAIL + bcolors.BOLD + "Unexpected error in 'Reset': {}".format(sys.exc_info()[0]) + bcolors.ENDC
+	print bcolors.FAIL + bcolors.BOLD + "Unexpected error in 'Reset': {}\n".format(sys.exc_info()[0]) + bcolors.ENDC
 
 def LearningMode():
     # here is Learning stuff
@@ -641,7 +648,13 @@ print "Preparing MySQL Database\n"
 username = raw_input('Enter MySQL username: ')
 password = raw_input('Enter MySQL password: ')
 try:
-    db_connection = MySQLdb.connect(host='127.0.0.1', user=username, passwd=password)
+    try:
+	db_connection = MySQLdb.connect(host='127.0.0.1', user=username, passwd=password)
+    except:
+	print bcolors.FAIL + bcolors.BOLD + "Invalid username or password for MySQL\n" 
+	print "Make sure MySQL server is running and your username and password are valid!\n" + bcolors.ENDC
+	sys.exit(2)
+	
     cursor = db_connection.cursor()
 
     cmd = "show databases like 'EvilAPDef'"
@@ -698,7 +711,8 @@ try:
     cmd = 'Truncate table ssids_OUIs'
     cursor.execute(cmd)
 except:
-	print bcolors.FAIL + bcolors.BOLD + "Unexpected error during intializing MySQL: {}".format(sys.exc_info()[0]) + bcolors.ENDC
+	print bcolors.FAIL + bcolors.BOLD + "Unexpected error during intializing MySQL: {}\n".format(sys.exc_info()[0]) 
+	sys.exit(2)
 
 Initialize_options()
 
@@ -727,7 +741,7 @@ try:
 	Reset("DB")
 	sys.exit(2)
 except:
-	print bcolors.FAIL + bcolors.BOLD + "Unexpected error during Preparing Monitor Interface: {}".format(sys.exc_info()[0]) + bcolors.ENDC
+	print bcolors.FAIL + bcolors.BOLD + "Unexpected error during Preparing Monitor Interface: {}\n".format(sys.exc_info()[0]) + bcolors.ENDC
 
 # Creating Monitor Interface	
 try:    
@@ -751,13 +765,13 @@ try:
 	print "\n 'wpa_supplicant' is running. I will stop it because it affects the application!"
 	os.system("pkill wpa_supplicant")
 except:
-	print bcolors.FAIL + bcolors.BOLD + "Unexpected error during Creating Monitor Interface: {}".format(sys.exc_info()[0]) + bcolors.ENDC
+	print bcolors.FAIL + bcolors.BOLD + "Unexpected error during Creating Monitor Interface: {}\n".format(sys.exc_info()[0]) + bcolors.ENDC
     
 ########### Remove the old output from airodump
 try:
     os.system('rm out.csv-01.*')
 except:
-	print bcolors.FAIL + bcolors.BOLD + "Unexpected error during removing old 'out.csv-01': {}".format(sys.exc_info()[0]) + bcolors.ENDC
+	print bcolors.FAIL + bcolors.BOLD + "Unexpected error during removing old 'out.csv-01': {}\n".format(sys.exc_info()[0]) + bcolors.ENDC
 
 # Scanning for available SSIDs
 print "\n\n======================="
@@ -775,7 +789,7 @@ try:
     airodump.terminate()
     db_connection.commit()
 except:
-	print bcolors.FAIL + bcolors.BOLD + "Unexpected error during scanning for available SSIDs: {}".format(sys.exc_info()[0]) + bcolors.ENDC
+	print bcolors.FAIL + bcolors.BOLD + "Unexpected error during scanning for available SSIDs: {}\n".format(sys.exc_info()[0]) + bcolors.ENDC
 
 ParseAirodumpCSV()
         
