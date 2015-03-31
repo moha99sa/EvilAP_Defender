@@ -50,9 +50,10 @@ def Usage():
     # Please don't remove this. At least respect my rights!
     print "Auther: Mohamed Hassan Mohamed Idris"
     print "\n====================================\n"
-    print "Normal Mode Usage: {} -N\n".format(sys.argv[0])
-    print "Learning Mode Usage: {} -L\n".format(sys.argv[0])
-    print "Help Screen: {} -h or --help".format(sys.argv[0])
+    print "Normal Mode Usage: {} -N [-u <username> -p <password>]\n".format(sys.argv[0])
+    print "Learning Mode Usage: {} -L [-u <username> -p <password>]\n".format(sys.argv[0])
+    print "Help Screen: {} -h or --help\n".format(sys.argv[0])
+    print "MySQL Username & Passowrd can be provided as arguments or after running the Tool"
     print "\n====================================\n"
     print "Special thanks to: Khaled Alhawasli, Mukhammed Khalilov, and Ayman Babkir"
     print "\n###############################################################\n"
@@ -68,12 +69,13 @@ def Help():
     print "	- Python"
     print "\nLearning:"
     print "--------------"
-    print "	- To configure the tool, all you need to do is to use '-L' option\n	  Then follow the wizard to configure the tool"
-    print "	- To use the tool, all you need to do is to use '-N' option"
+    print "	- To configure the tool, use '-L' option\n	  Then follow the wizard to configure the tool"
+    print "	- To use the tool, use '-N' option"
     print "\nUsage:"
     print "--------------"
-    print "	- Normal Mode Usage: {} -N\n".format(sys.argv[0])
-    print "	- Learning Mode Usage: {} -L".format(sys.argv[0])
+    print "	- Normal Mode Usage: {} -N [-u <username> -p <password>]".format(sys.argv[0])
+    print "	- Learning Mode Usage: {} -L [-u <username> -p <password>]".format(sys.argv[0])
+    print "	- MySQL Username & Passowrd can be provided as arguments or after running the Tool"
     print "\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
     sys.exit(2)
     
@@ -631,25 +633,57 @@ def LearningMode():
 ##################################################################### Main Start Here
 
 #opts, args = getopt.getopt(sys.argv[1:],"L")
-if "-L" in sys.argv[1:]:
-    print "Entering Learning Mode ...\n"
-    Mode = "Learning"
-elif "-N" in sys.argv[1:]:
-    print "Entering Normal Mode ...\n"
-    Mode = "Normal"
-elif ("-h" in sys.argv[1:]) or ("--help" in sys.argv[1:]):
-    Help()
-else:
-    Usage()
+'''
+try:
+    if "-L" in sys.argv[1:]:
+	print "Entering Learning Mode ...\n"
+	Mode = "Learning"
+    elif "-N" in sys.argv[1:]:
+	print "Entering Normal Mode ...\n"
+	Mode = "Normal"
+    elif ("-h" in sys.argv[1:]) or ("--help" in sys.argv[1:]):
+	Help()
+    else:
+	Usage()
+except:
+	print bcolors.FAIL + "Unexpected error while parsing arguments: {}".format(sys.exc_info()[0]) + bcolors.ENDC
+'''
+Mode = ""
+username = ""
+password = ""
 
+try:
+    opts, args = getopt.getopt(sys.argv[1:], "hLNu:p:", ["help"])
+except getopt.GetoptError:
+    Usage()
+except:
+	print bcolors.FAIL + "Unexpected error while parsing arguments: {}".format(sys.exc_info()[0]) + bcolors.ENDC    
+for opt, arg in opts:
+    if opt in ("-h", "--help"):
+	Help()
+    if opt == "-N":
+	Mode = "Normal"
+    if opt == "-L":
+	Mode = "Learning"
+    if opt == "-u":
+	username = arg
+    if opt == "-p":
+	password = arg
+
+if Mode == "":
+    Usage()
+	
 ########### MySQL Database setup and preparation
 print "Preparing MySQL Database\n"
 
-username = raw_input('Enter MySQL username: ')
-password = raw_input('Enter MySQL password: ')
+if username == "":
+    username = raw_input('Enter MySQL username: ')
+    password = raw_input('Enter MySQL password: ')
+    
 try:
     try:
 	db_connection = MySQLdb.connect(host='127.0.0.1', user=username, passwd=password)
+	print "Connected to MySQL\n"
     except:
 	print bcolors.FAIL + bcolors.BOLD + "Invalid username or password for MySQL\n" 
 	print "Make sure MySQL server is running and your username and password are valid!\n" + bcolors.ENDC
@@ -794,8 +828,10 @@ except:
 ParseAirodumpCSV()
         
 if Mode == "Normal":
+    print "Entering Normal Mode ...\n"
     CheckEvilAP()
 elif Mode == "Learning":
+    print "Entering Learning Mode ...\n"
     LearningMode()
 else:
     print("Mode is not identified, Please use the suitable option to run the tool or use '%s' with no options for help menu" % sys.argv[0])
