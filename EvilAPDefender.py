@@ -875,6 +875,6 @@ elif Mode == "Learning":
     print "Entering Learning Mode ...\n"
     LearningMode()
 else:
-    print("Mode is not identified, Please use the suitable option to run the tool or use '%s' with no options for help menu" % sys.argv[0])
+    print("Mode is not identified, Please use the suitable option to run the tool or use '%s' with no options for help menu." % sys.argv[0])
     
 Reset("All")
