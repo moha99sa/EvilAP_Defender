@@ -533,17 +533,17 @@ def LearningMode():
 		SSID = raw_input('Enter the SSID name you want to whitelist: ')
 		#cursor.execute("select * from ssids where mac='{}')
 		cmd = "select * from ssids where ssid=%s"
-		cursor.execute(cmd, (SSID))
+		cursor.execute(cmd, (SSID,))
 		if cursor.rowcount > 0:
 		    cmd = "delete from whitelist where ssid=%s"
-		    cursor.execute(cmd, (SSID))
+		    cursor.execute(cmd, (SSID,))
 		    cmd = "delete from whitelist_OUIs where ssid=%s"
-		    cursor.execute(cmd, (SSID))
+		    cursor.execute(cmd, (SSID,))
 		    cmd = "insert into whitelist(mac,ssid,min_pwr,max_pwr,channel,CIPHER,Enc,Auth) select mac,ssid,pwr-10,pwr+10,channel,CIPHER,Enc,Auth \
 		    from ssids where ssid = %s"
-		    cursor.execute(cmd, (SSID))
+		    cursor.execute(cmd, (SSID,))
 		    cmd = "insert into whitelist_OUIs select * from ssids_OUIs where ssid=%s"
-		    cursor.execute(cmd, (SSID))
+		    cursor.execute(cmd, (SSID,))
 		    db_connection.commit()
 		    print "The SSID and all its Access Points have been whitelisted!"
 		    time.sleep(1)
@@ -552,17 +552,17 @@ def LearningMode():
 	    elif choice == "2":
 		new_bssid = raw_input('Enter the BSSID you want to whitelist: ')
 		cmd = "select * from ssids where mac=%s"
-		cursor.execute(cmd, (new_bssid))
+		cursor.execute(cmd, (new_bssid,))
 		if cursor.rowcount > 0:
 		    cmd = "delete from whitelist where mac=%s"
-		    cursor.execute(cmd, (new_bssid))
+		    cursor.execute(cmd, (new_bssid,))
 		    cmd = "delete from whitelist_OUIs where mac=%s"
-		    cursor.execute(cmd, (new_bssid))
+		    cursor.execute(cmd, (new_bssid,))
 		    cmd = "insert into whitelist(mac,ssid,min_pwr,max_pwr,channel,CIPHER,Enc,Auth) select mac,ssid,pwr-10,pwr+10,channel,CIPHER,Enc,Auth \
 		    from ssids where mac = %s"
-		    cursor.execute(cmd, (new_bssid))
+		    cursor.execute(cmd, (new_bssid,))
 		    cmd = "insert into whitelist_OUIs select * from ssids_OUIs where mac=%s"
-		    cursor.execute(cmd, (new_bssid))
+		    cursor.execute(cmd, (new_bssid,))
 		    db_connection.commit()
 		    print "The identified Access Point has been whitelisted!"
 		    time.sleep(1)
@@ -571,14 +571,14 @@ def LearningMode():
 	    elif choice == "3":
 		bssid_rm = raw_input('Enter the BSSID you want to remove from whitelist: ')
 		cmd = "select * from whitelist where mac=%s"
-		cursor.execute(cmd, (bssid_rm))
+		cursor.execute(cmd, (bssid_rm,))
 		if cursor.rowcount > 0:
 		    bssid_rm_confirm = raw_input(bcolors.WARNING + 'This will remove the identified BSSID from whitelist! Are you still want to continue?(y/n): ' + bcolors.ENDC)
 		    if bssid_rm_confirm == "y":
 			cmd = "delete from whitelist where mac=%s"
-			cursor.execute(cmd, (bssid_rm))
+			cursor.execute(cmd, (bssid_rm,))
 			cmd = "delete from whitelist_OUIs where mac=%s"
-			cursor.execute(cmd, (bssid_rm))
+			cursor.execute(cmd, (bssid_rm,))
 			db_connection.commit()
 			print "The identified Access Point has been removed from the whitelist!"
 		    else:
@@ -620,34 +620,34 @@ def LearningMode():
 			cmd = "delete from options where opt_key = 'deauth_time'"
 			cursor.execute(cmd)
 			cmd = "insert into options values('deauth_time',%s)"
-			cursor.execute(cmd, (deauth_time))
+			cursor.execute(cmd, (deauth_time,))
 			deauth_repeat = int(raw_input('How many times do you want to repeat Deauth attack (minimum 1): '))
 			cmd = "delete from options where opt_key = 'deauth_repeat'"
 			cursor.execute(cmd)
 			cmd = "insert into options values('deauth_repeat',%s)"
-			cursor.execute(cmd, (deauth_repeat))
+			cursor.execute(cmd, (deauth_repeat,))
 			db_connection.commit()
 		    elif option == "2":
 			admin_email = raw_input('Enter admin email: ')
 			cmd = "delete from options where opt_key = 'admin_email'"
 			cursor.execute(cmd)
 			cmd = "insert into options values('admin_email',%s)"
-			cursor.execute(cmd, (admin_email))
+			cursor.execute(cmd, (admin_email,))
 			admin_smtp = raw_input('Enter SMTP address or IP: ')
 			cmd = "delete from options where opt_key = 'admin_smtp'"
 			cursor.execute(cmd)
 			cmd = "insert into options values('admin_smtp',%s)"
-			cursor.execute(cmd, (admin_smtp))
+			cursor.execute(cmd, (admin_smtp,))
 			admin_smtp_username = raw_input('Enter SMTP username for authentication (complete email): ')
 			cmd = "delete from options where opt_key = 'admin_smtp_username'"
 			cursor.execute(cmd)
 			cmd = "insert into options values('admin_smtp_username',%s)"
-			cursor.execute(cmd, (admin_smtp_username))
+			cursor.execute(cmd, (admin_smtp_username,))
 			admin_smtp_password = raw_input('Enter SMTP password for authentication: ')
 			cmd = "delete from options where opt_key = 'admin_smtp_password'"
 			cursor.execute(cmd)
 			cmd = "insert into options values('admin_smtp_password',%s)"
-			cursor.execute(cmd, (admin_smtp_password))
+			cursor.execute(cmd, (admin_smtp_password,))
 			db_connection.commit()
 		    else:
 			break
